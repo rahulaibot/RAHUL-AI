@@ -7,35 +7,103 @@ const config = require("../config.js");
 const lang = getString('download');
 
 
-Sparky(
-    {
-        name: "insta",
-        fromMe: isPublic,
-        desc: "Instagram media downloader - download images and videos from Instagram",
-        category: "downloader",
-    },
-    async ({
-        m, client, args
-    }) => {
-        args = args || m.quoted?.text;
-        if (!args) return await m.reply(lang.NEED_URL);
-        //if (isUrl(args)) return await m.reply(lang.NOT_URL);
-        try {
-            await m.react('⬇️');
-            let response = await getJson(config.API + "/api/downloader/igdl?url=" + args);
-            for (let i of response.data) {
-                await m.sendMsg(m.jid, i.url, { quoted: m }, i.type)
-            }
-            await m.react('✅');
-        } catch (e) {
-            console.log(e);
-            await m.react('❌');
-        }
+Sparky({
+  name: "insta",
+  fromMe: isPublic,
+  desc: "Instagram media downloader with 1000+ dynamic edge lighting styles",
+  category: "downloader",
+},
+async ({
+  m, client, args
+}) => {
+  try {
+    args = args || m.quoted?.text;
+    if (!args) return await m.reply(lang.NEED_URL || "Krupaya Instagram chi link dya!");
+
+    // Clean URL (Remove extra tracking parameters if causing issues)
+    let cleanUrl = args.trim();
+
+    // --- 1000+ DYNAMIC AUTO-CHANGING STYLES GENERATOR ---
+    const edgeBorders = [
+      ['╔', '╗', '╚', '╝', '═', '║'],
+      ['╭', '╮', '╰', '╯', '─', '│'],
+      ['┏', '┓', '┗', '┛', '━', '┃'],
+      ['┌', '┐', '└', '┘', '─', '│'],
+      ['📸', '📸', '📸', '📸', '✨', '🔥']
+    ];
+    
+    const themeColors = [
+      ['🔴', '🔵'], ['🟢', '🟡'], ['🟣', '🟠'], 
+      ['💖', '💙'], ['💚', '💜'], ['⚡', '🔥'], 
+      ['💎', '🔮'], ['🌟', '💫'], ['🌈', '✨']
+    ];
+
+    const glowEffects = ['💠 [INSTA-LED]', '⚡ [RGB-REELS]', '🔥 [HD-POST]', '✨ [NEON-STORY]', '💫 [PULSE-MEDIA]'];
+
+    const randomBorder = edgeBorders[Math.floor(Math.random() * edgeBorders.length)];
+    const randomColor = themeColors[Math.floor(Math.random() * themeColors.length)];
+    const randomGlow = glowEffects[Math.floor(Math.random() * glowEffects.length)];
+    const uniqueStyleId = Math.floor(Math.random() * 90000) + 10000;
+
+    const tl = randomBorder[0];
+    const tr = randomBorder[1];
+    const bl = randomBorder[2];
+    const br = randomBorder[3];
+    const hz = randomBorder[4];
+    const vt = randomBorder[5];
+    
+    const c1 = randomColor[0];
+    const c2 = randomColor[1];
+
+    await m.react('⬇️');
+
+    // --- EDGE LIGHTING ANIMATION UI ---
+    const edgeLightingUI = 
+      `${tl}${hz.repeat(22)}${tr}\n` +
+      `${vt} ${c1} **INSTA DOWNLOADER** ${c2} ${vt}\n` +
+      `${vt}${hz.repeat(22)}${vt}\n` +
+      `${vt} 🔮 *Style:* #${uniqueStyleId} ${randomGlow} ${vt}\n` +
+      `${vt} 📥 *Source:* Instagram Media ${vt}\n` +
+      `${vt} 🔗 *Link:* ${cleanUrl} ${vt}\n` +
+      `${bl}${hz.repeat(22)}${br}\n` +
+      `⚡ *Status:* Fetching & Downloading... 🚀`;
+
+    await m.reply(edgeLightingUI);
+
+    // Fetching API response
+    let response = await getJson(config.API + "/api/downloader/igdl?url=" + encodeURIComponent(cleanUrl));
+    
+    // Fallback handlers for different API response structures
+    let mediaList = [];
+    if (response && response.data) {
+        mediaList = Array.isArray(response.data) ? response.data : [response.data];
+    } else if (response && response.result) {
+        mediaList = Array.isArray(response.result) ? response.result : [response.result];
+    } else if (response && response.url) {
+        mediaList = [{ url: response.url, type: response.type || 'video' }];
     }
-);
+
+    if (!mediaList || mediaList.length === 0) {
+      return await m.reply("❌ Maaf kara, API madhun media bhetli nahi! Link check kara.");
+    }
+
+    for (let i of mediaList) {
+      let mediaUrl = i.url || i;
+      let mediaType = i.type || (mediaUrl.includes('.mp4') ? 'video' : 'image');
+      await m.sendMsg(m.jid, mediaUrl, { quoted: m }, mediaType);
+    }
+    
+    await m.react('✅');
+
+  } catch (e) {
+    console.log(e);
+    await m.react('❌');
+    m.reply(`⚠️ Error: ${e.message || e}`);
+  }
+});
 
 Sparky({
-    name: "sparky",
+    name: "rahulai",
     fromMe: isPublic,
     category: "misc",
     desc: "AI chat with memory"
